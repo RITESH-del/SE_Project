@@ -4,7 +4,7 @@ const AuthPage = lazy(() => import("./pages/AuthPage.jsx"));
 
 const routes = [
     {
-        path: "/auth",
+        path: "/login",
         element: <AuthPage />,
     },
 ];
