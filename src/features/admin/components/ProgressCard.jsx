@@ -1,45 +1,60 @@
-import { Paper, Progress, Stack, Text, Group } from '@mantine/core';
+import { Badge, Group, Paper, Progress, Stack, Text } from '@mantine/core';
 
 export default function ProgressCard({
   title,
   current,
   total,
+  value,
   description,
+  status,
 }) {
-  const percentage = total > 0
-    ? Math.round((current / total) * 100)
+  const isProgress = total !== undefined && total !== null;
+  const percentage = isProgress && total > 0
+    ? Math.min(100, Math.max(0, Math.round(((current || 0) / total) * 100)))
     : 0;
 
+  const statusColor = status === 'warning' ? 'yellow' : status === 'error' ? 'red' : 'blue';
+
   return (
-    <Paper w="100%"
-    //  withBorder
-    //  radius="md"
-     >
+    <Paper w="100%">
       <Stack gap="sm">
         <Group justify="space-between">
           <Text fw={600} size="md">
             {title}
           </Text>
 
-          <Text fw={700} size="md">
-            {percentage}%
-          </Text>
+          {isProgress ? (
+            <Text fw={700} size="md">
+              {percentage}%
+            </Text>
+          ) : value !== undefined && value !== null ? (
+            <Badge color={statusColor} variant="light" size="md">
+              {value}
+            </Badge>
+          ) : null}
         </Group>
 
-        <Progress
-          value={percentage}
-          size="xs"
-          radius="xl"
-        />
+        {isProgress && (
+          <Progress
+            value={percentage}
+            size="xs"
+            radius="xl"
+            color={percentage === 100 ? 'teal' : 'blue'}
+          />
+        )}
 
         <Group justify="space-between">
-          <Text size="xs" c="dimmed">
-            {current} of {total}
-          </Text>
+          {isProgress && (
+            <Text size="xs" c="dimmed">
+              {current ?? 0} of {total}
+            </Text>
+          )}
 
-          <Text size="xs" c="dimmed">
-            {description}
-          </Text>
+          {description && (
+            <Text size="xs" c="dimmed">
+              {description}
+            </Text>
+          )}
         </Group>
       </Stack>
     </Paper>

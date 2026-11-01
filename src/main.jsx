@@ -3,16 +3,17 @@ import { Provider } from 'react-redux'
 import { store } from './app/store'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import { MantineProvider } from '@mantine/core'
-import { Suspense, lazy } from 'react'
+import { Suspense } from 'react'
 import Spinner from './shared/components/Spinner'
 import '@mantine/core/styles.css'
+import '@mantine/dropzone/styles.css'
 
 /* Routes */
 import AuthRoutes from './features/auth/routes.jsx'
 import AdminRoutes from './features/admin/routes.jsx'
 
-const App = lazy(() => import("./App.jsx"));
-const ErrorPage = lazy(() => import("./shared/components/ErrorPage.jsx"));
+import App from './App.jsx'
+import ErrorPage from './shared/components/ErrorPage.jsx'
 
 const router = createBrowserRouter([
     {

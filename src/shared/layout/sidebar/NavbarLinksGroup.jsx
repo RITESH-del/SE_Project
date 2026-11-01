@@ -1,17 +1,12 @@
 import { useState } from 'react';
-import {
-  ChevronRight,
-} from 'lucide-react';
-
+import { ChevronRight } from 'lucide-react';
 import {
   Box,
-  Collapse,
   Group,
-  Text,
   ThemeIcon,
   UnstyledButton,
 } from '@mantine/core';
-
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import classes from './NavbarLinksGroup.module.css';
 
 export function LinksGroup({
@@ -19,37 +14,67 @@ export function LinksGroup({
   label,
   initiallyOpened = false,
   links,
+  link,
 }) {
-  const hasLinks = Array.isArray(links);
+  const hasLinks = Array.isArray(links) && links.length > 0;
+  const navigate = useNavigate();
+  const location = useLocation();
+  const currentPath = location.pathname;
+
+  const isChildActive = hasLinks && links.some((l) => currentPath === l.link);
+  const isControlActive = !hasLinks && Boolean(link) && currentPath === link;
+
   const [opened, setOpened] = useState(initiallyOpened);
+  const isExpanded = opened || isChildActive;
+
+  const handleControlClick = () => {
+    if (hasLinks) {
+      setOpened(!isExpanded);
+    } else if (link) {
+      navigate(link);
+    }
+  };
 
   const items = hasLinks
-    ? links.map((link) => (
-        <Text
-          component="a"
-          className={classes.link}
-          href={link.link}
-          key={link.label}
-          onClick={(event) => event.preventDefault()}
-        >
-          {link.label}
-        </Text>
-      ))
+    ? links.map((item) => {
+        const isActive = currentPath === item.link;
+        return (
+          <Link
+            key={item.label}
+            to={item.link}
+            className={classes.link}
+            data-active={isActive ? 'true' : undefined}
+          >
+            {item.label}
+          </Link>
+        );
+      })
     : null;
 
   return (
     <>
       <UnstyledButton
-        onClick={() => setOpened((current) => !current)}
+        onClick={handleControlClick}
         className={classes.control}
+        data-active={isControlActive ? 'true' : undefined}
       >
         <Group justify="space-between" gap={0}>
           <Box style={{ display: 'flex', alignItems: 'center' }}>
-            <ThemeIcon variant="light" size={30}>
-              <Icon size={18} />
-            </ThemeIcon>
+            {Icon && (
+              <ThemeIcon
+                variant={isControlActive || isChildActive ? 'filled' : 'light'}
+                color={isControlActive || isChildActive ? 'blue' : 'gray'}
+                size={30}
+              >
+                <Icon size={18} />
+              </ThemeIcon>
+            )}
 
-            <Box ml="md">
+            <Box
+              ml={Icon ? 'md' : 0}
+              fw={isControlActive || isChildActive ? 600 : 500}
+              c={isControlActive ? 'blue' : undefined}
+            >
               {label}
             </Box>
           </Box>
@@ -60,24 +85,18 @@ export function LinksGroup({
               strokeWidth={1.5}
               size={16}
               style={{
-                transform: opened ? 'rotate(90deg)' : 'none',
+                transform: isExpanded ? 'rotate(90deg)' : 'none',
               }}
             />
           )}
         </Group>
       </UnstyledButton>
 
-      {/* {hasLinks && (
-        <Collapse in={opened}>
+      {hasLinks && isExpanded && (
+        <div>
           {items}
-        </Collapse>
-      )} */}
-
-      {hasLinks && opened && (
-  <div>
-    {items}
-  </div>
-)}
+        </div>
+      )}
     </>
   );
 }

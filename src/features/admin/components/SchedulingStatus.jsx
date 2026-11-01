@@ -1,7 +1,7 @@
-import { Paper, Text, Stack } from '@mantine/core';
+import { Paper, Stack, Text } from '@mantine/core';
 import ProgressCard from './ProgressCard';
 
-export default function SchedulingStatus({ items }) {
+export default function SchedulingStatus({ title = 'Scheduling Status', items = [] }) {
   return (
     <Paper
       p="lg"
@@ -12,13 +12,15 @@ export default function SchedulingStatus({ items }) {
       h="auto"
     >
       <Stack gap="lg">
-        {/* <Text fw={600} size="lg">
-          Scheduling Status
-        </Text> */}
+        {title && (
+          <Text fw={600} size="lg">
+            {title}
+          </Text>
+        )}
 
-        {items.map((item) => (
+        {items.map((item, index) => (
           <ProgressCard
-            key={item.title}
+            key={item.title || index}
             {...item}
           />
         ))}

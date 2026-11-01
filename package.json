@@ -7,10 +7,12 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test": "jest"
   },
   "dependencies": {
     "@mantine/core": "^9.5.1",
+    "@mantine/dropzone": "^9.5.1",
     "@mantine/hooks": "^9.5.1",
     "@mantine/notifications": "^9.5.1",
     "@mantinex/mantine-logo": "^2.0.0",
@@ -26,17 +28,31 @@
     "react-router-dom": "^7.18.2",
     "recharts": "^3.10.1",
     "tailwind": "^4.0.0",
-    "tailwindcss": "^4.3.3"
+    "tailwindcss": "^4.3.3",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
+    "@babel/core": "^7.29.7",
+    "@babel/plugin-syntax-import-meta": "^7.10.4",
+    "@babel/preset-env": "^7.29.7",
+    "@babel/preset-react": "^7.29.7",
     "@eslint/js": "^10.0.1",
+    "@testing-library/jest-dom": "^7.0.1",
+    "@testing-library/react": "^16.3.3",
+    "@testing-library/user-event": "^14.6.8",
     "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^6.0.4",
+    "babel-jest": "^30.5.2",
+    "babel-plugin-transform-import-meta": "^2.3.3",
+    "babel-plugin-transform-vite-meta-env": "^1.0.3",
     "eslint": "^10.8.0",
     "eslint-plugin-react-hooks": "^7.1.1",
     "eslint-plugin-react-refresh": "^0.5.3",
     "globals": "^17.7.0",
+    "identity-obj-proxy": "^3.0.0",
+    "jest": "^30.5.2",
+    "jest-environment-jsdom": "^30.5.2",
     "vite": "^8.2.0"
   }
 }

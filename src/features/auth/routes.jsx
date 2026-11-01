@@ -1,12 +1,10 @@
-import { lazy } from "react";
-
-const AuthPage = lazy(() => import("./pages/AuthPage.jsx"));
+import AuthPage from './pages/AuthPage.jsx';
 
 const routes = [
-    {
-        path: "/login",
-        element: <AuthPage />,
-    },
+  {
+    path: '/login',
+    element: <AuthPage />,
+  },
 ];
 
 export default routes;

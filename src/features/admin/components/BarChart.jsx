@@ -17,20 +17,23 @@ import {
 
 export default function BarChart({
   title,
-  data,
+  data = [],
   xKey,
   dataKey,
   xLabel,
   yLabel,
 }) {
   const theme = useMantineTheme();
+  const barColor = theme.colors?.blue?.[6] || '#228be6';
 
   return (
     <Paper p="md" m="xs" withBorder radius="md">
       <Stack gap="md">
-        <Text fw={600} size="lg">
-          {title}
-        </Text>
+        {title && (
+          <Text fw={600} size="lg">
+            {title}
+          </Text>
+        )}
 
         <div style={{ width: '100%', height: 250 }}>
           <ResponsiveContainer width="100%" height="100%">
@@ -76,7 +79,7 @@ export default function BarChart({
 
               <Bar
                 dataKey={dataKey}
-                fill={theme.colors.blue[6]}
+                fill={barColor}
                 maxBarSize={20}
                 radius={[4, 4, 0, 0]}
               />

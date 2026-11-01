@@ -9,23 +9,25 @@ import {
 
 import { Paper, Text, Stack, useMantineTheme } from '@mantine/core';
 
-export default function PieChart({ title, data }) {
+export default function PieChart({ title, data = [] }) {
   const theme = useMantineTheme();
 
   const colors = [
-    theme.colors.blue[6],
-    theme.colors.green[6],
-    theme.colors.orange[6],
-    theme.colors.red[6],
-    theme.colors.violet[6],
+    theme.colors?.blue?.[6] || '#228be6',
+    theme.colors?.green?.[6] || '#40c057',
+    theme.colors?.orange?.[6] || '#fd7e14',
+    theme.colors?.red?.[6] || '#fa5252',
+    theme.colors?.violet?.[6] || '#7950f2',
   ];
 
   return (
     <Paper p="md" m="xs" withBorder radius="md">
       <Stack gap="md">
-        <Text fw={600} size="lg">
-          {title}
-        </Text>
+        {title && (
+          <Text fw={600} size="lg">
+            {title}
+          </Text>
+        )}
 
         <div style={{ width: '100%', height: 250 }}>
           <ResponsiveContainer width="100%" height="100%">
@@ -43,7 +45,7 @@ export default function PieChart({ title, data }) {
               >
                 {data.map((entry, index) => (
                   <Cell
-                    key={`cell-${index}`}
+                    key={`cell-${entry.label || index}`}
                     fill={colors[index % colors.length]}
                   />
                 ))}

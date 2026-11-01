@@ -4,7 +4,7 @@ import { StatsGroup } from '../../features/admin/components/StatsGroup';
 import PieChart from '../../features/admin/components/PieChart';
 import BarChart from '../../features/admin/components/BarChart';
 import ProgressCard from '../../features/admin/components/ProgressCard';
-import SchedulingStatus from '../../features/admin/components/schedulingStatus';
+import SchedulingStatus from '../../features/admin/components/SchedulingStatus';
 import { DataTable } from '../components/TableSort';
 
 const componentRegistry = {
@@ -17,27 +17,31 @@ const componentRegistry = {
 };
 
 function renderComponent(item, index) {
+  if (!item || typeof item !== 'object') {
+    return null;
+  }
 
   // Layout: row
   if (item.type === 'row') {
-  return (
-    <Grid key={`row-${index}`} gutter="md">
-      {item.data.children.map((child, childIndex) => (
-        <Grid.Col
-          key={`${child.type}-${childIndex}`}
-          span={{
-            base: 12,
-            md: child.span ?? 4,
-          }}
-        >
-          {renderComponent(child, childIndex)}
-        </Grid.Col>
-      ))}
-    </Grid>
-  );
-}
+    const children = Array.isArray(item.data?.children) ? item.data.children : [];
+    return (
+      <Grid key={`row-${index}`} gutter="md">
+        {children.map((child, childIndex) => (
+          <Grid.Col
+            key={`${child?.type || 'col'}-${childIndex}`}
+            span={{
+              base: 12,
+              md: child?.span ?? 4,
+            }}
+          >
+            {renderComponent(child, childIndex)}
+          </Grid.Col>
+        ))}
+      </Grid>
+    );
+  }
 
-  // Normal component
+  // Leaf component
   const Component = componentRegistry[item.type];
 
   if (!Component) {
@@ -45,22 +49,24 @@ function renderComponent(item, index) {
     return null;
   }
 
+  const componentData = item.data && typeof item.data === 'object' ? item.data : {};
+
   return (
     <Component
       key={`${item.type}-${index}`}
-      {...item.data}
+      {...componentData}
     />
   );
 }
 
-export default function DashboardRenderer({
-  components = [],
-}) {
+export default function DashboardRenderer({ components = [] }) {
+  if (!Array.isArray(components) || components.length === 0) {
+    return null;
+  }
+
   return (
     <Stack gap="md">
-      {components.map((item, index) =>
-        renderComponent(item, index)
-      )}
+      {components.map((item, index) => renderComponent(item, index))}
     </Stack>
   );
 }

@@ -1,111 +1,3 @@
-// import {
-//   Bell,
-//   CalendarDays,
-//   LogOut,
-//   Search,
-//   Settings,
-//   User,
-// } from 'lucide-react';
-
-// import {
-//   ActionIcon,
-//   Avatar,
-//   Burger,
-//   Group,
-//   Menu,
-//   Text,
-//   TextInput,
-// } from '@mantine/core';
-
-// import { useDisclosure } from '@mantine/hooks';
-// import classes from './HeaderSearch.module.css';
-
-// export function Header() {
-//   const [opened, { toggle }] = useDisclosure(false);
-
-//   return (
-//     <header className={classes.header}>
-//       <div className={classes.inner}>
-//         {/* Left side */}
-//         <Group gap="sm">
-//           <Burger
-//             opened={opened}
-//             onClick={toggle}
-//             size="sm"
-//             hiddenFrom="sm"
-//             aria-label="Toggle navigation"
-//           />
-
-//           <Group gap="xs">
-//             <CalendarDays size={24} strokeWidth={1.8} />
-
-//             <Text fw={700} size="lg">
-//               Timetable
-//             </Text>
-//           </Group>
-//         </Group>
-
-//         {/* Right side */}
-//         <Group gap="sm">
-//           <TextInput
-//             className={classes.search}
-//             placeholder="Search..."
-//             leftSection={
-//               <Search size={16} strokeWidth={1.5} />
-//             }
-//             visibleFrom="xs"
-//           />
-
-//           {/* <ActionIcon
-//             variant="subtle"
-//             size="lg"
-//             aria-label="Notifications"
-//           >
-//             <Bell size={20} strokeWidth={1.8} />
-//           </ActionIcon> */}
-
-//           <Menu shadow="md" width={200}>
-//             <Menu.Target>
-//               <ActionIcon
-//                 variant="subtle"
-//                 size="lg"
-//                 radius="xl"
-//               >
-//                 <Avatar size={30} radius="xl">
-//                   RK
-//                 </Avatar>
-//               </ActionIcon>
-//             </Menu.Target>
-
-//             <Menu.Dropdown>
-//               <Menu.Label>Account</Menu.Label>
-
-//               <Menu.Item leftSection={<User size={16} />}>
-//                 Profile
-//               </Menu.Item>
-
-//               <Menu.Item leftSection={<Settings size={16} />}>
-//                 Settings
-//               </Menu.Item>
-
-//               <Menu.Divider />
-
-//               <Menu.Item
-//                 color="red"
-//                 leftSection={<LogOut size={16} />}
-//               >
-//                 Logout
-//               </Menu.Item>
-//             </Menu.Dropdown>
-//           </Menu>
-//         </Group>
-//       </div>
-//     </header>
-//   );
-// }
-
-
-
 import {
   ActionIcon,
   Avatar,
@@ -115,50 +7,90 @@ import {
   Text,
   TextInput,
 } from '@mantine/core';
-
 import {
-  Bell,
   ChevronRight,
   LogOut,
   Search,
   Settings,
   User,
 } from 'lucide-react';
-
-import { useParams } from 'react-router-dom';
-
+import { useNavigate, useLocation } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { logoutUser } from '../../../features/auth/thunks/authThunks';
 import ToggleModeBtn from '../../components/ToggleModeBtn.jsx';
 import classes from './HeaderSearch.module.css';
 
-export function Header({ location }) {
- 
+const formatBreadcrumb = (path) => {
+  const routeMap = {
+    '/admin': ['Dashboard'],
+    '/admin/campus/student-groups': ['Campus', 'Student Groups'],
+    '/admin/campus/student/create': ['Campus', 'Students'],
+    '/admin/campus/faculty/create': ['Campus', 'Faculty'],
+    '/admin/campus/room/create': ['Campus', 'Rooms'],
+    '/admin/campus/course/create': ['Campus', 'Courses'],
+    '/admin/timetable': ['Timetable', 'Master Schedule'],
+    '/admin/timetable/create': ['Timetable', 'Generate Schedule'],
+    '/admin/settings': ['Settings', 'Operational Parameters'],
+  };
 
-  const params = useParams();
-  const paramValues = Object.values(params);
+  if (routeMap[path]) {
+    return routeMap[path];
+  }
 
-  const items = location
+  // Fallback for custom or parameterized sub-routes
+  const rawSegments = path
     .split('/')
     .filter(Boolean)
-    .filter((segment) => !paramValues.includes(segment))
-    .map((segment) => (
-      <Text key={segment} size="sm">
-        {segment
-          .split('-')
-          .map(
-            (word) =>
-              word.charAt(0).toUpperCase() + word.slice(1)
-          )
-          .join(' ')}
-      </Text>
-    ));
+    .filter((s) => s !== 'admin');
+
+  if (rawSegments.length === 0) return ['Dashboard'];
+
+  return rawSegments.map((s) =>
+    s
+      .split('-')
+      .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+      .join(' ')
+  );
+};
+
+export function Header({ location }) {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const routerLocation = useLocation();
+  const { user } = useSelector((state) => state.auth);
+
+  const currentPath = typeof location === 'string' ? location : (routerLocation?.pathname || '');
+
+  const handleLogout = async () => {
+    await dispatch(logoutUser());
+    navigate('/login');
+  };
+
+  const breadcrumbLabels = formatBreadcrumb(currentPath);
+  const items = breadcrumbLabels.map((label, idx) => (
+    <Text
+      key={label}
+      size="sm"
+      fw={idx === breadcrumbLabels.length - 1 ? 600 : 400}
+      c={idx === breadcrumbLabels.length - 1 ? 'var(--mantine-color-text)' : 'dimmed'}
+    >
+      {label}
+    </Text>
+  ));
+
+  const userInitials = user?.name
+    ? user.name.slice(0, 2).toUpperCase()
+    : user?.email
+      ? user.email.slice(0, 2).toUpperCase()
+      : 'SY';
 
   return (
     <header className={classes.header}>
-      {/* Left side */}
+      {/* Left side: Refined Breadcrumbs */}
       <Group gap="md" wrap="nowrap">
         <Breadcrumbs
           c="dimmed"
-          separator={<ChevronRight size={15} />}
+          separator={<ChevronRight size={14} opacity={0.6} />}
           styles={{
             separator: {
               color: 'var(--mantine-color-dimmed)',
@@ -170,16 +102,15 @@ export function Header({ location }) {
         </Breadcrumbs>
       </Group>
 
-      {/* Right side */}
+      {/* Right side: Search, Theme Toggle, Account Menu */}
       <Group gap="sm" wrap="nowrap">
-
         <TextInput
           placeholder="Search..."
           leftSection={<Search size={16} strokeWidth={1.5} />}
           w={240}
           visibleFrom="sm"
+          aria-label="Search"
         />
-
 
         <ToggleModeBtn />
 
@@ -192,7 +123,7 @@ export function Header({ location }) {
               aria-label="Account menu"
             >
               <Avatar size={30} radius="xl">
-                RK
+                {userInitials}
               </Avatar>
             </ActionIcon>
           </Menu.Target>
@@ -213,6 +144,7 @@ export function Header({ location }) {
             <Menu.Item
               color="red"
               leftSection={<LogOut size={16} />}
+              onClick={handleLogout}
             >
               Logout
             </Menu.Item>

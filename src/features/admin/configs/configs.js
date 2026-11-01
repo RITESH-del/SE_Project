@@ -1,12 +1,8 @@
 import {
   CalendarDays,
-  ClipboardList,
-  GraduationCap,
   LayoutDashboard,
   Settings,
-  Users,
   Building2,
-  BookOpen,
 } from 'lucide-react';
 
  export const SidebarConfigs = [
